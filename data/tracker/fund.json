@@ -1,0 +1,29 @@
+{
+ "name": "Demo Fund",
+ "capital_eur": 50000,
+ "start_date": "2026-10-27",
+ "entry_rule": "Bought at the official closing price of 27 Oct 2026; entry prices lock after the US close (20:20 UTC).",
+ "lock_after_utc": "2026-10-27T20:20:00Z",
+ "fx_fee": 0.005,
+ "shortfall_rule": "If costs push cash below zero, trim the holding with the lowest expected return (TotalEnergies) by the fewest whole shares.",
+ "shortfall_trim": "TTE",
+ "benchmark": {"name": "MSCI World (iShares Core MSCI World, EUR)", "symbol": "IWDA.AS"},
+ "fx_symbols": {"USD": "EURUSD=X", "GBP": "EURGBP=X", "PLN": "EURPLN=X"},
+ "withholding": {"United States": 0.15, "France": 0.128, "Netherlands": 0.15, "Germany": 0.26375, "United Kingdom": 0.0, "Poland": 0.19},
+ "limits": {"position": 12, "sector": 25, "france": 30, "usd": 50, "ai": 20},
+ "positions": [
+  {"id": "SAN",  "name": "Sanofi",                   "symbol": "SAN.PA", "exchange": "Euronext Paris",     "ccy": "EUR", "country": "France",         "sector": "Health Care",            "bucket": "Value",  "shares": 79,  "ai": false, "next_test": "Q3 30 Oct: Dupixent growth, ~10% guidance"},
+  {"id": "OTIS", "name": "Otis Worldwide",           "symbol": "OTIS",   "exchange": "NYSE",               "ccy": "USD", "country": "United States",  "sector": "Industrials",            "bucket": "Value",  "shares": 75,  "ai": false, "next_test": "Q3 28 Oct: service margin ≥ 22.5%, no 3rd cut"},
+  {"id": "UNA",  "name": "Unilever",                 "symbol": "UNA.AS", "exchange": "Euronext Amsterdam", "ccy": "EUR", "country": "United Kingdom", "sector": "Consumer Staples",       "bucket": "Value",  "shares": 77,  "ai": false, "next_test": "Q3 28 Oct: USG ≥ 4.5%, volume > 0"},
+  {"id": "BVI",  "name": "Bureau Veritas",           "symbol": "BVI.PA", "exchange": "Euronext Paris",     "ccy": "EUR", "country": "France",         "sector": "Industrials",            "bucket": "Value",  "shares": 156, "ai": false, "next_test": "FY late Feb; compliance provision"},
+  {"id": "SCI",  "name": "Service Corporation Intl", "symbol": "SCI",    "exchange": "NYSE",               "ccy": "USD", "country": "United States",  "sector": "Consumer Discretionary", "bucket": "Value",  "shares": 54,  "ai": false, "next_test": "Q3 28 Oct: core volume ≥ −2%, guide intact"},
+  {"id": "BRKB", "name": "Berkshire Hathaway B",     "symbol": "BRK-B",  "exchange": "NYSE",               "ccy": "USD", "country": "United States",  "sector": "Financials",             "bucket": "Value",  "shares": 8,   "ai": false, "next_test": "Q3 ~2–7 Nov: buybacks, cash, underwriting"},
+  {"id": "MC",   "name": "LVMH",                     "symbol": "MC.PA",  "exchange": "Euronext Paris",     "ccy": "EUR", "country": "France",         "sector": "Consumer Discretionary", "bucket": "Value",  "shares": 6,   "ai": false, "next_test": "FY late Jan: Fashion & Leather ≥ 0%"},
+  {"id": "TTE",  "name": "TotalEnergies",            "symbol": "TTE.PA", "exchange": "Euronext Paris",     "ccy": "EUR", "country": "France",         "sector": "Energy",                 "bucket": "Value",  "shares": 24,  "ai": false, "next_test": "Q3 29 Oct: buybacks; Hormuz talks"},
+  {"id": "MSFT", "name": "Microsoft",                "symbol": "MSFT",   "exchange": "Nasdaq",             "ccy": "USD", "country": "United States",  "sector": "Information Technology", "bucket": "Growth", "shares": 11,  "ai": true,  "next_test": "Q1 FY27 28 Oct: Azure ≥ 40%, FCF/NI up"},
+  {"id": "MA",   "name": "Mastercard",               "symbol": "MA",     "exchange": "NYSE",               "ccy": "USD", "country": "United States",  "sector": "Financials",             "bucket": "Growth", "shares": 10,  "ai": false, "next_test": "Q3 29 Oct: low-teens growth, cross-border ≥ 10%"},
+  {"id": "SAP",  "name": "SAP",                      "symbol": "SAP.DE", "exchange": "Xetra",              "ccy": "EUR", "country": "Germany",        "sector": "Information Technology", "bucket": "Growth", "shares": 21,  "ai": true,  "next_test": "Q4 late Jan: backlog ≥ 22% cc"},
+  {"id": "CHRT", "name": "Cohort",                   "symbol": "CHRT.L", "exchange": "London AIM",         "ccy": "GBP", "country": "United Kingdom", "sector": "Industrials",            "bucket": "Growth", "shares": 97,  "ai": false, "next_test": "H1 interims Dec: cash conversion ≥ 70%"},
+  {"id": "APR",  "name": "Auto Partner",             "symbol": "APR.WA", "exchange": "Warsaw",             "ccy": "PLN", "country": "Poland",         "sector": "Consumer Discretionary", "bucket": "Growth", "shares": 157, "ai": false, "next_test": "Q3 19 Nov: gross margin ≥ 28%"}
+ ]
+}

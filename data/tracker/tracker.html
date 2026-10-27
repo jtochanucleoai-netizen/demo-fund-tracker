@@ -1,0 +1,299 @@
+<title>Demo Fund Tracker</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: a fund factsheet that updates itself — status line, headline figures, fund vs benchmark, attribution and limits, positions ledger, method. Same identity as the group's Research Book and Playbook. */
+:root{
+  --bg:#f3f5f4; --surface:#ffffff; --ink:#15191b; --muted:#59625f; --line:#d9dfdc; --accent:#1d5a51; --accent-soft:#e3efec; --bench:#9aa4a0; --growth:#b0772a;
+  --good:#0b7a0b; --good-bg:#e2f3e2; --warn:#9a6a00; --warn-bg:#fbf0d6; --bad:#b02e2e; --bad-bg:#f8e1e1;
+  --display:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#111514; --surface:#191e1d; --ink:#eef2f0; --muted:#a2aba7; --line:#2b3331; --accent:#6dc1b2; --accent-soft:#1f2e2b; --bench:#6f7975; --growth:#e0a856;
+  --good:#5ccf5c; --good-bg:#173017; --warn:#f0c04a; --warn-bg:#352a10; --bad:#ec7272; --bad-bg:#3a1b1b; color-scheme:dark; } }
+:root[data-theme="dark"]{
+  --bg:#111514; --surface:#191e1d; --ink:#eef2f0; --muted:#a2aba7; --line:#2b3331; --accent:#6dc1b2; --accent-soft:#1f2e2b; --bench:#6f7975; --growth:#e0a856;
+  --good:#5ccf5c; --good-bg:#173017; --warn:#f0c04a; --warn-bg:#352a10; --bad:#ec7272; --bad-bg:#3a1b1b; color-scheme:dark; }
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;margin:0}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 56px;display:flex;flex-direction:column;gap:28px}
+h1,h2{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+h1{font-size:clamp(30px,4.4vw,42px);font-weight:700;line-height:1.05}
+h2{font-size:18px;font-weight:700}
+p{margin:0}
+a{color:var(--accent)}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.eyebrow{font-family:var(--display);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+header{display:flex;flex-direction:column;gap:8px;border-bottom:2px solid var(--ink);padding-bottom:16px}
+.lede{font-size:17px;max-width:70ch}
+.meta{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--muted);align-items:center}
+.pill{display:inline-flex;align-items:center;gap:6px;font-family:var(--display);font-weight:600;font-size:12px;letter-spacing:.03em;padding:2px 10px;border-radius:999px;white-space:nowrap}
+.pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.p-ok{background:var(--good-bg);color:var(--good)} .p-warn{background:var(--warn-bg);color:var(--warn)} .p-bad{background:var(--bad-bg);color:var(--bad)}
+.up{color:var(--good)} .down{color:var(--bad)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:14px 16px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.tile .l{font-family:var(--display);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.tile .v{font-family:var(--display);font-size:30px;font-weight:700;line-height:1.15;font-variant-numeric:tabular-nums}
+.tile .s{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:16px 18px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.note{font-size:13px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));gap:12px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--muted)}
+.sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.chart{position:relative;min-height:280px}
+.tip{position:absolute;pointer-events:none;background:var(--surface);border:1px solid var(--line);border-radius:6px;box-shadow:0 4px 14px rgba(0,0,0,.12);padding:6px 10px;font-size:12px;font-variant-numeric:tabular-nums;white-space:nowrap;z-index:2}
+.tip .d{color:var(--muted)}
+.split{display:flex;height:14px;border-radius:7px;overflow:hidden;background:var(--line)}
+.split span{display:block;height:100%}
+.tablebox{overflow-x:auto;max-height:680px;overflow-y:auto;border:1px solid var(--line);border-radius:6px}
+table{border-collapse:collapse;width:100%;font-size:13.5px;font-variant-numeric:tabular-nums}
+th,td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap;vertical-align:top}
+th{position:sticky;top:0;background:var(--surface);font-family:var(--display);font-weight:600;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);z-index:1}
+th button{all:unset;cursor:pointer}
+th button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+th[aria-sort] button::after{content:" ▾";color:var(--accent)} th[aria-sort=ascending] button::after{content:" ▴"}
+tr:last-child td{border-bottom:0}
+td.n,th.n{text-align:right}
+td.wrap{white-space:normal;min-width:15rem}
+td .sub{display:block;font-size:12px;color:var(--muted)}
+.nm{font-weight:600}
+.method{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:10px 24px;margin:0;padding:0;list-style:none;font-size:13.5px;color:var(--muted)}
+.method b{color:var(--ink)}
+footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+@media (max-width:760px){.sec{display:none}}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">Financial Management · group project · €50,000 demo fund</div>
+  <h1>Demo Fund Tracker</h1>
+  <p class="lede" id="lede">Loading the latest valuation…</p>
+  <div class="meta"><span id="asof"></span><span class="pill" id="lockpill"></span><span class="pill" id="limitpill"></span><span><a href="https://claude.ai/artifact/LskLQi2b5VJhtMEd5geAzi">Research Book →</a></span></div>
+</header>
+
+<section class="tiles" aria-label="Headline figures">
+  <div class="tile"><span class="l">Fund value</span><span class="v" id="t-nav">—</span><span class="s" id="t-nav-s"></span></div>
+  <div class="tile"><span class="l">Return since start</span><span class="v" id="t-ret">—</span><span class="s" id="t-ret-s"></span></div>
+  <div class="tile"><span class="l">Versus MSCI World</span><span class="v" id="t-ex">—</span><span class="s">percentage points ahead (+) or behind (−)</span></div>
+  <div class="tile"><span class="l">Latest day</span><span class="v" id="t-day">—</span><span class="s" id="t-day-s"></span></div>
+  <div class="tile"><span class="l">Cash</span><span class="v" id="t-cash">—</span><span class="s" id="t-cash-s"></span></div>
+  <div class="tile"><span class="l">Worst drawdown</span><span class="v" id="t-dd">—</span><span class="s">largest fall from a previous high</span></div>
+</section>
+
+<section class="card" id="performance">
+  <h2>Fund vs MSCI World since 27 October</h2>
+  <p class="note">Cumulative return in euros, after trading costs and dividends. Both start at €50,000 on the 27 Oct close.</p>
+  <div class="legend"><span><i class="sw" style="background:var(--accent)"></i>Demo Fund</span><span><i class="sw" style="background:var(--bench)"></i>MSCI World (IWDA, EUR)</span></div>
+  <div class="chart" id="navchart"></div>
+</section>
+
+<div class="grid">
+  <section class="card" id="contribution">
+    <h2>What drove the return</h2>
+    <p class="note">Each holding's gain or loss in euros, as percentage points of the €50,000 fund, including currency moves, fees and dividends.</p>
+    <div id="contrib"></div>
+  </section>
+  <section class="card" id="limits">
+    <h2>Value vs growth</h2>
+    <p class="note">Share of the fund at current prices. The plan keeps growth between 30% and 40%.</p>
+    <div class="split" id="split" aria-hidden="true"></div>
+    <div class="legend"><span><i class="sw" style="background:var(--accent)"></i>Value <b class="num" id="l-val"></b></span><span><i class="sw" style="background:var(--growth)"></i>Growth <b class="num" id="l-gro"></b></span></div>
+    <h2>Policy limits</h2>
+    <p class="note">Checked at every update. "Watch" means within one point of the cap.</p>
+    <div class="tablebox"><table><thead><tr><th>Limit</th><th>Where</th><th class="n">Fund</th><th class="n">Cap</th><th>Status</th></tr></thead><tbody id="ltable"></tbody></table></div>
+  </section>
+</div>
+
+<section class="card" id="positions">
+  <h2>Positions</h2>
+  <p class="note">Bought at the 27 Oct close. Click a column to sort. The gain splits into the share-price move (local currency) and the currency move against the euro.</p>
+  <div class="tablebox"><table id="ptable">
+    <thead><tr>
+      <th><button type="button" data-k="name">Stock</button></th>
+      <th class="sec"><button type="button" data-k="bucket">Bucket</button></th>
+      <th class="n sec"><button type="button" data-k="shares">Shares</button></th>
+      <th class="n sec"><button type="button" data-k="entry_price">Bought at</button></th>
+      <th class="n"><button type="button" data-k="last_price">Last</button></th>
+      <th class="n"><button type="button" data-k="day_change_pct">Day</button></th>
+      <th class="n"><button type="button" data-k="value_eur">Value</button></th>
+      <th class="n"><button type="button" data-k="weight_pct">Weight</button></th>
+      <th class="n"><button type="button" data-k="pnl_eur">Gain €</button></th>
+      <th class="n"><button type="button" data-k="pnl_pct">Gain %</button></th>
+      <th class="n sec"><button type="button" data-k="price_ret_pct">Price</button></th>
+      <th class="n sec"><button type="button" data-k="fx_ret_pct">FX</button></th>
+      <th class="n sec"><button type="button" data-k="dividends_eur">Dividends</button></th>
+      <th class="sec">Next results test</th>
+    </tr></thead>
+    <tbody id="pbody"></tbody></table></div>
+</section>
+
+<section class="card" id="method">
+  <h2>How the tracker works</h2>
+  <ul class="method">
+    <li><b>Purchase.</b> The fund buys the 13 holdings of the group's final order at the official closing price of 27 October 2026, the day the portfolio was presented. No broker account is used.</li>
+    <li><b>Costs.</b> A 0.5% currency-conversion fee (XTB's rate) on every purchase in dollars, pounds or zloty, and on converting dividends. Where costs left cash below zero, the fund bought one share fewer of TotalEnergies, the holding with the lowest expected return.</li>
+    <li><b>Dividends.</b> Credited to cash on the ex-dividend date, after withholding tax at source (US 15%, France 12.8%, Netherlands 15%, Germany 26.4%, Poland 19%, UK 0%). Portuguese tax is not deducted.</li>
+    <li><b>Benchmark.</b> iShares Core MSCI World (IWDA, Amsterdam, in euros), scaled to the same €50,000 start.</li>
+    <li><b>Updates.</b> Automatic, twice per weekday: after the European close and after the US close (scheduled runs on GitHub, which can start up to an hour late). Between updates the figures show the last prices fetched.</li>
+    <li><b>Changes.</b> Phase-2 alterations (around 24 November) are recorded as sales and purchases at that day's close, with the same costs.</li>
+  </ul>
+</section>
+<footer id="foot" data-repo="https://github.com/jtochanucleoai-netizen/demo-fund-tracker">Prices: Yahoo Finance (delayed). Educational project, not investment advice.</footer>
+</div>
+
+<script type="application/json" id="fund-data">{"summary": [{"as_of": "2026-10-27T17:10+00:00", "valuation_date": "2026-10-27", "start_date": "2026-10-27", "capital_eur": 50000, "fund_eur": 49869.12, "benchmark_eur": 50000.0, "return_pct": -0.26, "benchmark_return_pct": 0.0, "excess_pp": -0.26, "pnl_eur": -130.88, "day_change_eur": -130.88, "day_change_pct": -0.26, "cash_eur": 31.99, "fees_eur": 130.89, "dividends_eur": 0, "max_drawdown_pct": 0.0, "value_pct": 64.3, "growth_pct": 35.6, "best_name": "Sanofi", "best_pp": 0.0, "worst_name": "Mastercard", "worst_pp": -0.055, "limits_breached": 0, "entry_locked": false, "holdings": 13, "adjustments": "TTE −1 share (cash shortfall)"}], "positions": [{"id": "SAN", "name": "Sanofi", "ticker": "SAN.PA", "exchange": "Euronext Paris", "bucket": "Value", "sector": "Health Care", "country": "France", "currency": "EUR", "shares": 79, "entry_price": 75.15, "last_price": 75.15, "day_change_pct": 0.76, "cost_eur": 5936.85, "value_eur": 5936.85, "weight_pct": 11.9, "dividends_eur": 0, "pnl_eur": 0.0, "pnl_pct": 0.0, "price_ret_pct": 0.0, "fx_ret_pct": 0.0, "contribution_pp": 0.0, "next_test": "Q3 30 Oct: Dupixent growth, ~10% guidance", "price_time": "2026-10-27T16:37+00:00"}, {"id": "MA", "name": "Mastercard", "ticker": "MA", "exchange": "NYSE", "bucket": "Growth", "sector": "Financials", "country": "United States", "currency": "USD", "shares": 10, "entry_price": 608.76, "last_price": 608.76, "day_change_pct": -0.77, "cost_eur": 5490.97, "value_eur": 5463.65, "weight_pct": 10.96, "dividends_eur": 0, "pnl_eur": -27.32, "pnl_pct": -0.5, "price_ret_pct": 0.0, "fx_ret_pct": 0.0, "contribution_pp": -0.055, "next_test": "Q3 29 Oct: low-teens growth, cross-border ≥ 10%", "price_time": "2026-10-27T17:10+00:00"}, {"id": "MSFT", "name": "Microsoft", "ticker": "MSFT", "exchange": "Nasdaq", "bucket": "Growth", "sector": "Information Technology", "country": "United States", "currency": "USD", "shares": 11, "entry_price": 532.14, "last_price": 532.14, "day_change_pct": -0.09, "cost_eur": 5279.85, "value_eur": 5253.58, "weight_pct": 10.53, "dividends_eur": 0, "pnl_eur": -26.27, "pnl_pct": -0.5, "price_ret_pct": 0.0, "fx_ret_pct": 0.0, "contribution_pp": -0.053, "next_test": "Q1 FY27 28 Oct: Azure ≥ 40%, FCF/NI up", "price_time": "2026-10-27T17:10+00:00"}, {"id": "OTIS", "name": "Otis Worldwide", "ticker": "OTIS", "exchange": "NYSE", "bucket": "Value", "sector": "Industrials", "country": "United States", "currency": "USD", "shares": 75, "entry_price": 74.07, "last_price": 74.07, "day_change_pct": -1.59, "cost_eur": 5010.79, "value_eur": 4985.86, "weight_pct": 10.0, "dividends_eur": 0, "pnl_eur": -24.93, "pnl_pct": -0.5, "price_ret_pct": 0.0, "fx_ret_pct": 0.0, "contribution_pp": -0.05, "next_test": "Q3 28 Oct: service margin ≥ 22.5%, no 3rd cut", "price_time": "2026-10-27T17:10+00:00"}, {"id": "BVI", "name": "Bureau Veritas", "ticker": "BVI.PA", "exchange": "Euronext Paris", "bucket": "Value", "sector": "Industrials", "country": "France", "currency": "EUR", "shares": 156, "entry_price": 28.88, "last_price": 28.88, "day_change_pct": -0.76, "cost_eur": 4505.28, "value_eur": 4505.28, "weight_pct": 9.03, "dividends_eur": 0, "pnl_eur": 0.0, "pnl_pct": 0.0, "price_ret_pct": 0.0, "fx_ret_pct": 0.0, "contribution_pp": 0.0, "next_test": "FY late Feb; compliance provision", "price_time": "2026-10-27T16:36+00:00"}, {"id": "UNA", "name": "Unilever", "ticker": "UNA.AS", "exchange": "Euronext Amsterdam", "bucket": "Value", "sector": "Consumer Staples", "country": "United Kingdom", "currency": "EUR", "shares": 77, "entry_price": 58.48, "last_price": 58.48, "day_change_pct": -0.65, "cost_eur": 4502.96, "value_eur": 4502.96, "weight_pct": 9.03, "dividends_eur": 0, "pnl_eur": 0.0, "pnl_pct": 0.0, "price_ret_pct": 0.0, "fx_ret_pct": 0.0, "contribution_pp": 0.0, "next_test": "Q3 28 Oct: USG ≥ 4.5%, volume > 0", "price_time": "2026-10-27T16:35+00:00"}, {"id": "SAP", "name": "SAP", "ticker": "SAP.DE", "exchange": "Xetra", "bucket": "Growth", "sector": "Information Technology", "country": "Germany", "currency": "EUR", "shares": 21, "entry_price": 213.15, "last_price": 213.15, "day_change_pct": 0.42, "cost_eur": 4476.15, "value_eur": 4476.15, "weight_pct": 8.98, "dividends_eur": 0, "pnl_eur": 0.0, "pnl_pct": 0.0, "price_ret_pct": 0.0, "fx_ret_pct": 0.0, "contribution_pp": 0.0, "next_test": "Q4 late Jan: backlog ≥ 22% cc", "price_time": "2026-10-27T16:38+00:00"}, {"id": "SCI", "name": "Service Corporation Intl", "ticker": "SCI", "exchange": "NYSE", "bucket": "Value", "sector": "Consumer Discretionary", "country": "United States", "currency": "USD", "shares": 54, "entry_price": 82.415, "last_price": 82.415, "day_change_pct": 0.07, "cost_eur": 4014.23, "value_eur": 3994.26, "weight_pct": 8.01, "dividends_eur": 0, "pnl_eur": -19.97, "pnl_pct": -0.5, "price_ret_pct": 0.0, "fx_ret_pct": 0.0, "contribution_pp": -0.04, "next_test": "Q3 28 Oct: core volume ≥ −2%, guide intact", "price_time": "2026-10-27T17:10+00:00"}, {"id": "BRKB", "name": "Berkshire Hathaway B", "ticker": "BRK-B", "exchange": "NYSE", "bucket": "Value", "sector": "Financials", "country": "United States", "currency": "USD", "shares": 8, "entry_price": 544.94, "last_price": 544.94, "day_change_pct": -0.66, "cost_eur": 3932.25, "value_eur": 3912.69, "weight_pct": 7.85, "dividends_eur": 0, "pnl_eur": -19.56, "pnl_pct": -0.5, "price_ret_pct": 0.0, "fx_ret_pct": 0.0, "contribution_pp": -0.039, "next_test": "Q3 ~2–7 Nov: buybacks, cash, underwriting", "price_time": "2026-10-27T17:10+00:00"}, {"id": "MC", "name": "LVMH", "ticker": "MC.PA", "exchange": "Euronext Paris", "bucket": "Value", "sector": "Consumer Discretionary", "country": "France", "currency": "EUR", "shares": 6, "entry_price": 388.25, "last_price": 388.25, "day_change_pct": 0.74, "cost_eur": 2329.5, "value_eur": 2329.5, "weight_pct": 4.67, "dividends_eur": 0, "pnl_eur": 0.0, "pnl_pct": 0.0, "price_ret_pct": 0.0, "fx_ret_pct": 0.0, "contribution_pp": 0.0, "next_test": "FY late Jan: Fashion & Leather ≥ 0%", "price_time": "2026-10-27T16:36+00:00"}, {"id": "TTE", "name": "TotalEnergies", "ticker": "TTE.PA", "exchange": "Euronext Paris", "bucket": "Value", "sector": "Energy", "country": "France", "currency": "EUR", "shares": 23, "entry_price": 83.0, "last_price": 83.0, "day_change_pct": -1.0, "cost_eur": 1909.0, "value_eur": 1909.0, "weight_pct": 3.83, "dividends_eur": 0, "pnl_eur": 0.0, "pnl_pct": 0.0, "price_ret_pct": 0.0, "fx_ret_pct": 0.0, "contribution_pp": 0.0, "next_test": "Q3 29 Oct: buybacks; Hormuz talks", "price_time": "2026-10-27T16:39+00:00"}, {"id": "CHRT", "name": "Cohort", "ticker": "CHRT.L", "exchange": "London AIM", "bucket": "Growth", "sector": "Industrials", "country": "United Kingdom", "currency": "GBP", "shares": 97, "entry_price": 13.38, "last_price": 13.38, "day_change_pct": -0.3, "cost_eur": 1559.48, "value_eur": 1551.72, "weight_pct": 3.11, "dividends_eur": 0, "pnl_eur": -7.76, "pnl_pct": -0.5, "price_ret_pct": 0.0, "fx_ret_pct": 0.0, "contribution_pp": -0.016, "next_test": "H1 interims Dec: cash conversion ≥ 70%", "price_time": "2026-10-27T16:35+00:00"}, {"id": "APR", "name": "Auto Partner", "ticker": "APR.WA", "exchange": "Warsaw", "bucket": "Growth", "sector": "Consumer Discretionary", "country": "Poland", "currency": "PLN", "shares": 157, "entry_price": 28.45, "last_price": 28.45, "day_change_pct": 2.89, "cost_eur": 1020.71, "value_eur": 1015.63, "weight_pct": 2.04, "dividends_eur": 0, "pnl_eur": -5.08, "pnl_pct": -0.5, "price_ret_pct": 0.0, "fx_ret_pct": 0.0, "contribution_pp": -0.01, "next_test": "Q3 19 Nov: gross margin ≥ 28%", "price_time": "2026-10-27T16:04+00:00"}], "nav": [{"date": "2026-10-27", "fund_eur": 49869.12, "benchmark_eur": 50000.0, "fund_ret": -0.002618, "benchmark_ret": 0.0, "excess_pp": -0.262}], "limits": [{"limit": "Largest position", "detail": "Sanofi", "value_pct": 11.9, "cap_pct": 12, "status": "Watch"}, {"limit": "Largest sector", "detail": "Industrials", "value_pct": 22.14, "cap_pct": 25, "status": "OK"}, {"limit": "French-domiciled", "detail": "France", "value_pct": 29.43, "cap_pct": 30, "status": "Watch"}, {"limit": "US-dollar exposure", "detail": "USD", "value_pct": 47.35, "cap_pct": 50, "status": "OK"}, {"limit": "AI-linked", "detail": "Microsoft + SAP", "value_pct": 19.51, "cap_pct": 20, "status": "Watch"}]}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js" integrity="sha384-CjloA8y00+1SDAUkjs099PVfnY2KmDC2BZnws9kh8D/lX1s46w6EPhpXdqMfjK6i" crossorigin="anonymous"></script>
+<script>
+(() => {
+  let D;
+  try { D = JSON.parse(document.getElementById('fund-data').textContent); } catch (e) { document.getElementById('lede').textContent = 'The valuation data could not be read. The next update will replace it.'; return; }
+  const S = D.summary[0], P = D.positions, N = D.nav, L = D.limits;
+  const f0 = d3.format(',.0f'), f2 = d3.format(',.2f');
+  const sgn = (v) => (v > 0 ? '+' : v < 0 ? '−' : '');
+  const eur = (v, dp = 0) => '€' + (dp ? f2 : f0)(v);
+  const sEur = (v) => sgn(v) + '€' + f0(Math.abs(v));
+  const pct = (v, dp = 2) => sgn(v) + d3.format('.' + dp + 'f')(Math.abs(v)) + '%';
+  const pp = (v) => sgn(v) + d3.format('.2f')(Math.abs(v)) + ' pp';
+  const CUR = { EUR: '€', USD: '$', GBP: '£', PLN: 'zł ' };
+  const price = (v, c) => (CUR[c] || '') + f2(v);
+  const tone = (v) => (v > 0 ? 'up' : v < 0 ? 'down' : '');
+  const set = (id, t, cls) => { const e = document.getElementById(id); e.textContent = t; if (cls !== undefined) e.className = e.className.split(' ')[0] + ' ' + cls; };
+  const dayFmt = (iso) => d3.utcFormat('%a %-d %b')(new Date(iso + 'T00:00:00Z'));
+  const asOf = new Date(S.as_of);
+
+  // header
+  const ahead = S.excess_pp >= 0;
+  document.getElementById('lede').textContent = `The fund is ${pct(S.return_pct)} since it was bought on 27 October, against ${pct(S.benchmark_return_pct)} for MSCI World in euros: ${pp(Math.abs(S.excess_pp)).replace(/^[+−]/, '')} ${ahead ? 'ahead of' : 'behind'} the benchmark.`;
+  document.getElementById('asof').textContent = 'Prices to ' + asOf.toLocaleString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Lisbon' }) + ' Lisbon';
+  const lock = document.getElementById('lockpill');
+  lock.textContent = S.entry_locked ? 'Purchase prices final' : 'Purchase prices provisional until the 27 Oct US close';
+  lock.className = 'pill ' + (S.entry_locked ? 'p-ok' : 'p-warn');
+  const lp = document.getElementById('limitpill');
+  lp.textContent = S.limits_breached ? `${S.limits_breached} limit${S.limits_breached > 1 ? 's' : ''} breached` : 'All policy limits respected';
+  lp.className = 'pill ' + (S.limits_breached ? 'p-bad' : 'p-ok');
+
+  // tiles
+  set('t-nav', eur(S.fund_eur)); set('t-nav-s', 'Gain since start ' + sEur(S.pnl_eur));
+  set('t-ret', pct(S.return_pct), tone(S.return_pct)); set('t-ret-s', 'MSCI World ' + pct(S.benchmark_return_pct));
+  set('t-ex', pp(S.excess_pp), tone(S.excess_pp));
+  set('t-day', sEur(S.day_change_eur), tone(S.day_change_eur)); set('t-day-s', pct(S.day_change_pct) + ' on ' + dayFmt(S.valuation_date));
+  set('t-cash', eur(S.cash_eur, 2)); set('t-cash-s', `Dividends ${eur(S.dividends_eur, 2)} · fees paid ${eur(S.fees_eur, 2)}`);
+  set('t-dd', pct(S.max_drawdown_pct));
+  set('l-val', d3.format('.1f')(S.value_pct) + '%'); set('l-gro', d3.format('.1f')(S.growth_pct) + '%');
+  const split = document.getElementById('split');
+  [[S.value_pct, 'var(--accent)'], [S.growth_pct, 'var(--growth)']].forEach(([w, c]) => { const b = document.createElement('span'); b.style.width = w + '%'; b.style.background = c; split.append(b); });
+  document.getElementById('foot').textContent = `Prices: Yahoo Finance (delayed). Valuation date ${S.valuation_date}; fund started ${S.start_date} with ${eur(S.capital_eur)}. Purchase adjustments: ${S.adjustments}. Every update is committed to the public repository github.com/jtochanucleoai-netizen/demo-fund-tracker. Educational project, not investment advice.`;
+
+  // limits
+  const lt = document.getElementById('ltable');
+  L.forEach((r) => {
+    const tr = document.createElement('tr');
+    [[r.limit], [r.detail], [d3.format('.1f')(r.value_pct) + '%', 'n num'], [r.cap_pct + '%', 'n num']].forEach(([t, c]) => { const td = document.createElement('td'); if (c) td.className = c; td.textContent = t; tr.append(td); });
+    const td = document.createElement('td'), s = document.createElement('span');
+    s.className = 'pill ' + (r.status === 'Breach' ? 'p-bad' : r.status === 'Watch' ? 'p-warn' : 'p-ok'); s.textContent = r.status; td.append(s); tr.append(td); lt.append(tr);
+  });
+
+  // positions table
+  const body = document.getElementById('pbody'), table = document.getElementById('ptable');
+  let key = 'value_eur', dir = -1;
+  const cell = (tr, t, c) => { const td = document.createElement('td'); if (c) td.className = c; td.textContent = t; tr.append(td); return td; };
+  function drawTable() {
+    body.replaceChildren();
+    table.querySelectorAll('th').forEach((th) => { const b = th.querySelector('button'); th.removeAttribute('aria-sort'); if (b && b.dataset.k === key) th.setAttribute('aria-sort', dir > 0 ? 'ascending' : 'descending'); });
+    P.slice().sort((a, b) => (typeof a[key] === 'number' ? a[key] - b[key] : String(a[key]).localeCompare(String(b[key]))) * dir).forEach((r) => {
+      const tr = document.createElement('tr');
+      const n = cell(tr, r.name, 'nm'); const sub = document.createElement('span'); sub.className = 'sub'; sub.textContent = `${r.ticker} · ${r.exchange}`; n.append(sub);
+      cell(tr, r.bucket, 'sec');
+      cell(tr, d3.format(',')(r.shares), 'n num sec');
+      cell(tr, price(r.entry_price, r.currency), 'n num sec');
+      cell(tr, price(r.last_price, r.currency), 'n num');
+      cell(tr, pct(r.day_change_pct), 'n num ' + tone(r.day_change_pct));
+      cell(tr, eur(r.value_eur), 'n num');
+      cell(tr, d3.format('.1f')(r.weight_pct) + '%', 'n num');
+      cell(tr, sEur(r.pnl_eur), 'n num ' + tone(r.pnl_eur));
+      cell(tr, pct(r.pnl_pct), 'n num ' + tone(r.pnl_pct));
+      cell(tr, pct(r.price_ret_pct), 'n num sec');
+      cell(tr, pct(r.fx_ret_pct), 'n num sec');
+      cell(tr, eur(r.dividends_eur, 2), 'n num sec');
+      cell(tr, r.next_test, 'wrap sec');
+      body.append(tr);
+    });
+  }
+  table.querySelectorAll('th button').forEach((b) => b.addEventListener('click', () => {
+    const k = b.dataset.k; dir = k === key ? -dir : (k === 'name' || k === 'bucket' ? 1 : -1); key = k; drawTable();
+  }));
+  drawTable();
+
+  const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+  // fund vs benchmark
+  const box = document.getElementById('navchart');
+  function drawNav() {
+    box.replaceChildren();
+    const rows = N.map((r) => ({ d: new Date(r.date + 'T00:00:00Z'), f: r.fund_ret * 100, b: r.benchmark_ret * 100, fe: r.fund_eur, be: r.benchmark_eur }));
+    const W = Math.max(300, box.clientWidth), H = 280, m = { t: 12, r: 18, b: 28, l: 48 };
+    const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('role', 'img').attr('aria-label', 'Cumulative return of the fund and MSCI World');
+    const ext = d3.extent(rows.flatMap((r) => [r.f, r.b, 0])); const pad = Math.max(0.5, (ext[1] - ext[0]) * 0.12);
+    const y = d3.scaleLinear([ext[0] - pad, ext[1] + pad], [H - m.b, m.t]).nice();
+    const xd = rows.length > 1 ? d3.extent(rows, (r) => r.d) : [d3.utcDay.offset(rows[0].d, -1), d3.utcDay.offset(rows[0].d, 1)];
+    const x = d3.scaleUtc(xd, [m.l, W - m.r]);
+    svg.append('g').selectAll('line').data(y.ticks(5)).join('line').attr('x1', m.l).attr('x2', W - m.r).attr('y1', y).attr('y2', y)
+      .attr('stroke', (v) => (v === 0 ? css('--muted') : css('--line'))).attr('stroke-width', 1).attr('stroke-dasharray', (v) => (v === 0 ? '4 3' : null));
+    svg.append('g').selectAll('text').data(y.ticks(5)).join('text').attr('x', m.l - 8).attr('y', y).attr('dy', '0.32em').attr('text-anchor', 'end')
+      .attr('font-size', 11).attr('font-family', css('--mono')).attr('fill', css('--muted')).text((v) => d3.format('+.1f')(v) + '%');
+    const ticks = rows.length > 1 ? x.ticks(Math.max(2, Math.min(rows.length, Math.floor((W - m.l) / 90)))) : [rows[0].d];
+    svg.append('g').selectAll('text').data(ticks).join('text').attr('x', x).attr('y', H - 8).attr('text-anchor', 'middle')
+      .attr('font-size', 11).attr('font-family', css('--mono')).attr('fill', css('--muted')).text(d3.utcFormat('%-d %b'));
+    const line = (k) => d3.line().x((r) => x(r.d)).y((r) => y(r[k]));
+    svg.append('path').datum(rows).attr('d', line('b')).attr('fill', 'none').attr('stroke', css('--bench')).attr('stroke-width', 2).attr('stroke-linejoin', 'round').attr('stroke-linecap', 'round');
+    svg.append('path').datum(rows).attr('d', line('f')).attr('fill', 'none').attr('stroke', css('--accent')).attr('stroke-width', 2.5).attr('stroke-linejoin', 'round').attr('stroke-linecap', 'round');
+    const last = rows[rows.length - 1];
+    svg.append('circle').attr('cx', x(last.d)).attr('cy', y(last.b)).attr('r', 3).attr('fill', css('--bench'));
+    svg.append('circle').attr('cx', x(last.d)).attr('cy', y(last.f)).attr('r', 4).attr('fill', css('--accent'));
+    if (rows.length < 2) { const n = document.createElement('p'); n.className = 'note'; n.textContent = 'Day one: the line starts after the first full trading day. The fund starts below €50,000 because the currency fees are paid on day one.'; box.append(n); }
+    const tip = document.createElement('div'); tip.className = 'tip'; tip.hidden = true; box.append(tip);
+    const rule = svg.append('line').attr('y1', m.t).attr('y2', H - m.b).attr('stroke', css('--muted')).attr('stroke-dasharray', '3 3').attr('visibility', 'hidden');
+    svg.append('rect').attr('x', m.l).attr('y', m.t).attr('width', W - m.l - m.r).attr('height', H - m.t - m.b).attr('fill', 'transparent')
+      .on('pointermove', (ev) => {
+        const [px] = d3.pointer(ev); const r = rows[d3.minIndex(rows, (q) => Math.abs(x(q.d) - px))];
+        rule.attr('x1', x(r.d)).attr('x2', x(r.d)).attr('visibility', 'visible');
+        tip.replaceChildren();
+        const add = (t, cls, sw) => { const e = document.createElement('div'); if (cls) e.className = cls; if (sw) { const s = document.createElement('i'); s.className = 'sw'; s.style.background = sw; e.append(s); } e.append(t); tip.append(e); };
+        add(d3.utcFormat('%a %-d %b %Y')(r.d), 'd'); add(`Fund ${pct(r.f)} · ${eur(r.fe)}`, '', css('--accent')); add(`MSCI World ${pct(r.b)} · ${eur(r.be)}`, '', css('--bench'));
+        tip.hidden = false; const bw = box.clientWidth, sx = (x(r.d) / W) * bw;
+        tip.style.left = Math.min(Math.max(0, sx + 12), bw - tip.offsetWidth) + 'px'; tip.style.top = '6px';
+      })
+      .on('pointerleave', () => { tip.hidden = true; rule.attr('visibility', 'hidden'); });
+  }
+
+  // contribution bars
+  const cbox = document.getElementById('contrib');
+  function drawContrib() {
+    cbox.replaceChildren();
+    const rows = P.map((r) => ({ name: r.name, v: r.contribution_pp })).sort((a, b) => b.v - a.v);
+    const W = Math.max(300, cbox.clientWidth), bh = 18, gap = 8, H = rows.length * (bh + gap);
+    const svg = d3.select(cbox).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('role', 'img').attr('aria-label', 'Contribution to fund return by holding');
+    const fmt = (v) => sgn(v) + d3.format('.2f')(Math.abs(v)) + ' pp';
+    const probe = svg.append('text').attr('font-size', 12).attr('font-family', css('--body'));
+    let nw = 0, vw = 0; rows.forEach((r) => { probe.text(r.name); nw = Math.max(nw, probe.node().getComputedTextLength()); probe.text(fmt(r.v)); vw = Math.max(vw, probe.node().getComputedTextLength()); });
+    probe.remove();
+    const left = nw + 12, right = W - vw - 10, mx = Math.max(0.05, d3.max(rows, (r) => Math.abs(r.v)));
+    const x = d3.scaleLinear([-mx, mx], [left, right]);
+    const g = svg.selectAll('g').data(rows).join('g').attr('transform', (r, i) => `translate(0,${i * (bh + gap)})`);
+    g.append('text').attr('x', left - 8).attr('y', bh / 2).attr('dy', '0.35em').attr('text-anchor', 'end').attr('font-size', 12).attr('font-family', css('--body')).attr('fill', css('--ink')).text((r) => r.name);
+    g.append('rect').attr('x', (r) => Math.min(x(0), x(r.v))).attr('width', (r) => Math.max(1, Math.abs(x(r.v) - x(0)))).attr('height', bh).attr('rx', 4).attr('fill', (r) => (r.v >= 0 ? css('--good') : css('--bad'))).attr('opacity', 0.85);
+    g.append('text').attr('x', (r) => (r.v >= 0 ? x(r.v) + 6 : x(0) + 6)).attr('y', bh / 2).attr('dy', '0.35em').attr('font-size', 12).attr('font-family', css('--mono')).attr('fill', css('--muted')).text((r) => fmt(r.v));
+    svg.append('line').attr('x1', x(0)).attr('x2', x(0)).attr('y1', 0).attr('y2', H).attr('stroke', css('--muted'));
+  }
+  const drawAll = () => { if (window.d3) { drawNav(); drawContrib(); } };
+  drawAll();
+  let t; window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(drawAll, 150); });
+  if (window.matchMedia) window.matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', drawAll);
+  new MutationObserver(drawAll).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+})();
+</script>
