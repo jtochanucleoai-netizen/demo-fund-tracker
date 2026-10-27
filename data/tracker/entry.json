@@ -12,10 +12,10 @@
   },
   "OTIS": {
    "shares": 75,
-   "px": 74.07,
+   "px": 74.1,
    "fx": 0.8975049362771494,
-   "gross_eur": 4985.86,
-   "fee_eur": 24.93
+   "gross_eur": 4987.88,
+   "fee_eur": 24.94
   },
   "UNA": {
    "shares": 77,
@@ -33,16 +33,16 @@
   },
   "SCI": {
    "shares": 54,
-   "px": 82.415,
+   "px": 82.45,
    "fx": 0.8975049362771494,
-   "gross_eur": 3994.26,
-   "fee_eur": 19.97
+   "gross_eur": 3995.96,
+   "fee_eur": 19.98
   },
   "BRKB": {
    "shares": 8,
-   "px": 544.94,
+   "px": 544.85,
    "fx": 0.8975049362771494,
-   "gross_eur": 3912.69,
+   "gross_eur": 3912.04,
    "fee_eur": 19.56
   },
   "MC": {
@@ -61,17 +61,17 @@
   },
   "MSFT": {
    "shares": 11,
-   "px": 532.14,
+   "px": 532.34,
    "fx": 0.8975049362771494,
-   "gross_eur": 5253.58,
-   "fee_eur": 26.27
+   "gross_eur": 5255.56,
+   "fee_eur": 26.28
   },
   "MA": {
    "shares": 10,
-   "px": 608.76,
+   "px": 608.68,
    "fx": 0.8975049362771494,
-   "gross_eur": 5463.65,
-   "fee_eur": 27.32
+   "gross_eur": 5462.93,
+   "fee_eur": 27.31
   },
   "SAP": {
    "shares": 21,
@@ -90,14 +90,14 @@
   "APR": {
    "shares": 157,
    "px": 28.45,
-   "fx": 0.22738125014211327,
-   "gross_eur": 1015.63,
+   "fx": 0.22739159105896262,
+   "gross_eur": 1015.68,
    "fee_eur": 5.08
   }
  },
- "cost_eur": 49968.03,
- "cash_eur": 31.97,
- "fees_eur": 130.89,
+ "cost_eur": 49972.43,
+ "cash_eur": 27.57,
+ "fees_eur": 130.91,
  "adjustments": [
   "TTE \u22121 share (cash shortfall)"
  ]
