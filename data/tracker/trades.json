@@ -1,73 +1,73 @@
 [
  {
   "date": "2026-11-24",
-  "locked": false,
-  "locked_at": null,
+  "locked": true,
+  "locked_at": "2026-11-24T22:27:06+00:00",
   "reason": "Change window opened by the teacher. Sanofi's pre-written exit rule was triggered by its $41bn cash acquisition of Insmed (above \u20ac20bn, and net debt above 2.5x EBITDA on our estimate), and Sanofi (14%) and French companies (31%) were above their 12% / 30% limits. Sanofi cut to about 9%; proceeds go to SAP and Bureau Veritas, the two holdings furthest below our fair values with room under the limits; Bureau Veritas is limited to 35 shares so Industrials stay under the 25% sector limit; remaining cash buys Unilever. The group also opened a small speculative position of 2 Moderna shares (under 1% of the fund) after its positive Phase 3 cancer-vaccine results, sized small because the price already assumes much of the success. Any cash left after Unilever buys whole Auto Partner shares (about \u20ac6 each), so the fund stays fully invested.",
   "orders": [
    {
     "id": "SAN",
     "side": "sell",
     "shares": 29,
-    "px": 92.53,
+    "px": 93.58,
     "fx": 1.0,
-    "gross_eur": 2683.37,
+    "gross_eur": 2713.82,
     "fee_eur": 0.0,
-    "gain_eur": 504.02,
-    "tax_eur": 141.13,
-    "flow_eur": 2542.24
+    "gain_eur": 534.47,
+    "tax_eur": 149.65,
+    "flow_eur": 2564.17
    },
    {
     "id": "SAP",
     "side": "buy",
     "shares": 6,
-    "px": 189.16,
+    "px": 190.08,
     "fx": 1.0,
-    "gross_eur": 1134.96,
+    "gross_eur": 1140.48,
     "fee_eur": 0.0,
     "gain_eur": 0.0,
     "tax_eur": 0.0,
-    "flow_eur": -1134.96
+    "flow_eur": -1140.48
    },
    {
     "id": "BVI",
     "side": "buy",
     "shares": 35,
-    "px": 29.81,
+    "px": 29.83,
     "fx": 1.0,
-    "gross_eur": 1043.35,
+    "gross_eur": 1044.05,
     "fee_eur": 0.0,
     "gain_eur": 0.0,
     "tax_eur": 0.0,
-    "flow_eur": -1043.35
+    "flow_eur": -1044.05
    },
    {
     "id": "MRNA",
     "side": "buy",
     "shares": 2,
-    "px": 223.09,
-    "fx": 0.9116601331023795,
-    "gross_eur": 406.76,
-    "fee_eur": 2.03,
+    "px": 227.38,
+    "fx": 0.9118263882556761,
+    "gross_eur": 414.66,
+    "fee_eur": 2.07,
     "gain_eur": 0.0,
     "tax_eur": 0.0,
-    "flow_eur": -408.8
+    "flow_eur": -416.74
    },
    {
     "id": "APR",
     "side": "buy",
-    "shares": 5,
+    "shares": 6,
     "px": 26.9,
-    "fx": 0.22451224714308163,
-    "gross_eur": 30.2,
-    "fee_eur": 0.15,
+    "fx": 0.2244366639734267,
+    "gross_eur": 36.22,
+    "fee_eur": 0.18,
     "gain_eur": 0.0,
     "tax_eur": 0.0,
-    "flow_eur": -30.35
+    "flow_eur": -36.41
    }
   ],
   "cash_before_eur": 79.36,
-  "cash_after_eur": 4.15,
+  "cash_after_eur": 5.86,
   "adjustments": []
  }
 ]
