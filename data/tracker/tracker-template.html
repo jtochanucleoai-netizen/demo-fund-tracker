@@ -132,6 +132,12 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
     <tbody id="pbody"></tbody></table></div>
 </section>
 
+<section class="card" id="changes">
+  <h2>Changes to the portfolio</h2>
+  <p class="note" id="changes-note">Trades made when the teacher opened a change window, at that day's closing price.</p>
+  <div class="tablebox"><table><thead><tr><th>Date</th><th>Company</th><th>Trade</th><th class="n">Shares</th><th class="n">Price</th><th class="n">Amount</th><th class="n">Tax</th><th>Status</th></tr></thead><tbody id="tbody"></tbody></table></div>
+</section>
+
 <section class="card" id="method">
   <h2>How the tracker works</h2>
   <ul class="method">
@@ -140,7 +146,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
     <li><b>Dividends.</b> Credited to cash on the ex-dividend date, after withholding tax at source (US 15%, France 12.8%, Netherlands 15%, Germany 26.4%, Poland 19%, UK 0%). Portuguese tax is not deducted.</li>
     <li><b>Benchmark.</b> iShares Core MSCI World (IWDA, Amsterdam, in euros), scaled to the same €50,000 start.</li>
     <li><b>Updates.</b> Automatic, twice per weekday: after the European close and after the US close (scheduled runs on GitHub, which can start up to an hour late). Between updates the figures show the last prices fetched.</li>
-    <li><b>Changes.</b> Phase-2 alterations (around 24 November) are recorded as sales and purchases at that day's close, with the same costs.</li>
+    <li><b>Changes.</b> The portfolio only changes when the teacher opens a change window. Trades are recorded at that day's closing price, sales first, with the same currency fee and a 28% tax on any gain from a sale (average purchase cost). Gains on positions include sales after tax.</li>
   </ul>
 </section>
 <footer id="foot" data-repo="https://github.com/jtochanucleoai-netizen/demo-fund-tracker">Prices: Yahoo Finance (delayed). Educational project, not investment advice.</footer>
@@ -182,7 +188,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
   set('t-ret', pct(S.return_pct), tone(S.return_pct)); set('t-ret-s', 'MSCI World ' + pct(S.benchmark_return_pct));
   set('t-ex', pp(S.excess_pp), tone(S.excess_pp));
   set('t-day', sEur(S.day_change_eur), tone(S.day_change_eur)); set('t-day-s', pct(S.day_change_pct) + ' on ' + dayFmt(S.valuation_date));
-  set('t-cash', eur(S.cash_eur, 2)); set('t-cash-s', `Dividends ${eur(S.dividends_eur, 2)} · fees paid ${eur(S.fees_eur, 2)}`);
+  set('t-cash', eur(S.cash_eur, 2)); set('t-cash-s', `Dividends ${eur(S.dividends_eur, 2)} · fees ${eur(S.fees_eur, 2)} · tax ${eur(S.taxes_eur || 0, 2)}`);
   set('t-dd', pct(S.max_drawdown_pct));
   set('l-val', d3.format('.1f')(S.value_pct) + '%'); set('l-gro', d3.format('.1f')(S.growth_pct) + '%');
   const split = document.getElementById('split');
@@ -196,6 +202,17 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
     [[r.limit], [r.detail], [d3.format('.1f')(r.value_pct) + '%', 'n num'], [r.cap_pct + '%', 'n num']].forEach(([t, c]) => { const td = document.createElement('td'); if (c) td.className = c; td.textContent = t; tr.append(td); });
     const td = document.createElement('td'), s = document.createElement('span');
     s.className = 'pill ' + (r.status === 'Breach' ? 'p-bad' : r.status === 'Watch' ? 'p-warn' : 'p-ok'); s.textContent = r.status; td.append(s); tr.append(td); lt.append(tr);
+  });
+
+  // trades
+  const tb = document.getElementById('tbody'), T = D.trades || [];
+  if (!T.length) { document.getElementById('changes').hidden = true; }
+  T.forEach((r) => {
+    const tr = document.createElement('tr');
+    [[d3.utcFormat('%-d %b %Y')(new Date(r.date + 'T00:00:00Z'))], [r.company], [r.side === 'sell' ? 'Sell' : 'Buy', r.side === 'sell' ? 'down' : 'up'],
+     [d3.format(',')(r.shares), 'n num'], [price(r.price, r.currency), 'n num'], [eur(r.amount_eur), 'n num'], [r.tax_eur ? eur(r.tax_eur, 2) : '—', 'n num'], [r.status]]
+      .forEach(([t, c]) => { const td = document.createElement('td'); if (c) td.className = c; td.textContent = t; tr.append(td); });
+    tb.append(tr);
   });
 
   // positions table

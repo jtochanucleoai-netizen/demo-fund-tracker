@@ -24,6 +24,6 @@ jobs:
           cp data/tracker/tracker.html docs/index.html
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/index.html data/tracker/nav.csv data/tracker/entry.json
+          git add docs/index.html data/tracker/nav.csv data/tracker/entry.json data/tracker/trades.json
           git diff --cached --quiet || git commit -m "Tracker update $(date -u '+%Y-%m-%d %H:%M') UTC"
           git push
