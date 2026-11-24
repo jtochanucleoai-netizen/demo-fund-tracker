@@ -200,6 +200,19 @@
    "shares": 157,
    "ai": false,
    "next_test": "Q3 19 Nov: gross margin ≥ 28%"
+  },
+  {
+   "id": "MRNA",
+   "name": "Moderna",
+   "symbol": "MRNA",
+   "exchange": "Nasdaq",
+   "ccy": "USD",
+   "country": "United States",
+   "sector": "Health Care",
+   "bucket": "Growth",
+   "shares": 0,
+   "ai": false,
+   "next_test": "Intismeran regulatory filings (FDA/EMA) and overall-survival data; Q4 results Feb 2027"
   }
  ],
  "tax_rate": 0.28,
@@ -207,7 +220,7 @@
   {
    "date": "2026-11-24",
    "lock_after_utc": "2026-11-24T21:15:00Z",
-   "reason": "Change window opened by the teacher. Sanofi's pre-written exit rule was triggered by its $41bn cash acquisition of Insmed (above €20bn, and net debt above 2.5x EBITDA on our estimate), and Sanofi (14%) and French companies (31%) were above their 12% / 30% limits. Sanofi cut to about 9%; proceeds go to SAP and Bureau Veritas, the two holdings furthest below our fair values with room under the limits; Bureau Veritas is limited to 35 shares so Industrials stay under the 25% sector limit; remaining cash buys Unilever.",
+   "reason": "Change window opened by the teacher. Sanofi's pre-written exit rule was triggered by its $41bn cash acquisition of Insmed (above €20bn, and net debt above 2.5x EBITDA on our estimate), and Sanofi (14%) and French companies (31%) were above their 12% / 30% limits. Sanofi cut to about 9%; proceeds go to SAP and Bureau Veritas, the two holdings furthest below our fair values with room under the limits; Bureau Veritas is limited to 35 shares so Industrials stay under the 25% sector limit; remaining cash buys Unilever. The group also opened a small speculative position of 2 Moderna shares (under 1% of the fund) after its positive Phase 3 cancer-vaccine results, sized small because the price already assumes much of the success. Any cash left after Unilever buys whole Auto Partner shares (about €6 each), so the fund stays fully invested.",
    "orders": [
     {
      "id": "SAN",
@@ -225,7 +238,17 @@
      "shares": 35
     },
     {
+     "id": "MRNA",
+     "side": "buy",
+     "shares": 2
+    },
+    {
      "id": "UNA",
+     "side": "buy",
+     "shares": "fill"
+    },
+    {
+     "id": "APR",
      "side": "buy",
      "shares": "fill"
     }

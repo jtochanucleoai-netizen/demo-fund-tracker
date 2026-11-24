@@ -120,8 +120,10 @@ def main():
                  "positions": rows, "cost_eur": round(cost, 2), "cash_eur": round(CAP - cost, 2),
                  "fees_eur": round(sum(r["fee_eur"] for r in rows.values()), 2), "adjustments": adjustments}
         json.dump(entry, open(ep, "w"), indent=1)
-    E = entry["positions"]
+    E = dict(entry["positions"])
     P = {p["id"]: p for p in pos}
+    for p in pos:                                        # holdings added later through trades start with no shares
+        E.setdefault(p["id"], {"shares": 0, "px": 0.0, "fx": 1.0, "gross_eur": 0.0, "fee_eur": 0.0})
     TAX = CFG.get("tax_rate", 0.0)
 
     def px_on(i, d):
@@ -228,8 +230,10 @@ def main():
         st = state[i]
         px, fx = at(c, today), eur_per(p["ccy"], today)
         prev_days = [k for k in c if k < today]
-        prev = c[prev_days[-1]] if prev_days else E[i]["px"]
+        prev = c[prev_days[-1]] if prev_days else (E[i]["px"] or px)
         sh = st["shares"]
+        if sh == 0 and st["units"] == 0:
+            continue                                     # not held yet (trade still to come)
         value = sh * px * fx
         bought = E[i]["gross_eur"] + E[i]["fee_eur"] + sum(o["gross_eur"] + o["fee_eur"] for t in sets for o in t["orders"] if o["id"] == i and o["side"] == "buy")
         sold_net = sum(o["flow_eur"] for t in sets for o in t["orders"] if o["id"] == i and o["side"] == "sell")
