@@ -1,0 +1,61 @@
+[
+ {
+  "date": "2026-11-24",
+  "locked": false,
+  "locked_at": null,
+  "reason": "Change window opened by the teacher. Sanofi's pre-written exit rule was triggered by its $41bn cash acquisition of Insmed (above \u20ac20bn, and net debt above 2.5x EBITDA on our estimate), and Sanofi (14%) and French companies (31%) were above their 12% / 30% limits. Sanofi cut to about 9%; proceeds go to SAP and Bureau Veritas, the two holdings furthest below our fair values with room under the limits; Bureau Veritas is limited to 35 shares so Industrials stay under the 25% sector limit; remaining cash buys Unilever.",
+  "orders": [
+   {
+    "id": "SAN",
+    "side": "sell",
+    "shares": 29,
+    "px": 90.29,
+    "fx": 1.0,
+    "gross_eur": 2618.41,
+    "fee_eur": 0.0,
+    "gain_eur": 439.06,
+    "tax_eur": 122.94,
+    "flow_eur": 2495.47
+   },
+   {
+    "id": "SAP",
+    "side": "buy",
+    "shares": 6,
+    "px": 184.6,
+    "fx": 1.0,
+    "gross_eur": 1107.6,
+    "fee_eur": 0.0,
+    "gain_eur": 0.0,
+    "tax_eur": 0.0,
+    "flow_eur": -1107.6
+   },
+   {
+    "id": "BVI",
+    "side": "buy",
+    "shares": 35,
+    "px": 29.72,
+    "fx": 1.0,
+    "gross_eur": 1040.2,
+    "fee_eur": 0.0,
+    "gain_eur": 0.0,
+    "tax_eur": 0.0,
+    "flow_eur": -1040.2
+   },
+   {
+    "id": "UNA",
+    "side": "buy",
+    "shares": 7,
+    "px": 58.83,
+    "fx": 1.0,
+    "gross_eur": 411.81,
+    "fee_eur": 0.0,
+    "gain_eur": 0.0,
+    "tax_eur": 0.0,
+    "flow_eur": -411.81
+   }
+  ],
+  "cash_before_eur": 79.36,
+  "cash_after_eur": 15.22,
+  "adjustments": []
+ }
+]
